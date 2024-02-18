@@ -1,0 +1,9 @@
+
+Kcsharpsquid:S3903")Move 'ItemEffect' into a named namespace.(³ñıÿÿÿÿ
+¢csharpsquid:S1186"yAdd a nested comment explaining why this method is empty, throw a 'NotSupportedException' or complete the implementation.(ûàîºûÿÿÿÿ8¼ËŸóÔ1
+¢csharpsquid:S1186"yAdd a nested comment explaining why this method is empty, throw a 'NotSupportedException' or complete the implementation.(®±®“üÿÿÿÿ8¼ËŸóÔ1
+mcsharpsquid:S1104"DMake this field 'private' and encapsulate it in a 'public' property.(”ƒ·»ÿÿÿÿÿ8Ö®‚àÔ1
+hcsharpsquid:S1104"DMake this field 'private' and encapsulate it in a 'public' property.(–ÿ†è8†Ó¥àÔ1
+hcsharpsquid:S1104"DMake this field 'private' and encapsulate it in a 'public' property.(±Æ®¶8Ñ•øßÔ1
+mcsharpsquid:S1104"DMake this field 'private' and encapsulate it in a 'public' property.(ªìÆŞşÿÿÿÿ8×­µàÔ1
+mcsharpsquid:S1104"DMake this field 'private' and encapsulate it in a 'public' property.(–Ù”úÿÿÿÿ8Óå÷òÔ1
