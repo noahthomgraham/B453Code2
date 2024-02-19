@@ -16,19 +16,9 @@ public class ItemEffect : MonoBehaviour
     public EffectKind effect;
     public float effectDuration;
     public float amount;
+    public byte healAmount;
     public ButtonToSeal sealButton;
     public AudioClip effectSE;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
@@ -39,7 +29,7 @@ public class ItemEffect : MonoBehaviour
             PlayerController target = other.gameObject.GetComponent<PlayerController>();
             if (effect == EffectKind.HEAL)
             {
-                target.addHealth((int) Math.Round(amount));
+                MyEvents.OnHealthPickUp.Invoke(healAmount);
             }
 
             if (effect == EffectKind.MOVEMENT)

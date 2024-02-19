@@ -6,9 +6,10 @@ public class EnemyAIController : MonoBehaviour
 {
     private Transform playerPosition;
 
-    public float hp;
+    [SerializeField] byte MAX_HP = 100;
+    private byte hp;
     public float moveSpeed;
-    public int damageOnHit;
+    public byte damageOnHit; //damage to player
 
     public GameObject fireProjectile;
     public float fireRate;
@@ -66,8 +67,6 @@ public class EnemyAIController : MonoBehaviour
         }
 
         transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
-        //gameObject.transform.position = new Vector3(gameObject.transform.position.x + moveSpeed,gameObject.transform.position.y, gameObject.transform.position.z);
-
     }
 
     private void flipFacingDirection()
@@ -106,15 +105,9 @@ public class EnemyAIController : MonoBehaviour
     
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "PlayerAttack")
+        if(collision.gameObject.tag == "Player" && collision.transform.parent == null)
         {
-            hp -= collision.gameObject.GetComponent<PlayerAttack>().getDamage();
-            Debug.Log("hit: hp = " + hp);
-            if (hp <= 0)
-            {
-                PlayerPrefs.SetInt("Score", PlayerPrefs.GetInt("Score") + 1);
-                Destroy(gameObject);
-            }
+            MyEvents.OnPlayerDamaged.Invoke(damageOnHit);
         }
         
         if (!isPursuingPlayer && (
@@ -127,8 +120,13 @@ public class EnemyAIController : MonoBehaviour
         }
     }
 
-    public int getDamageOnHit()
+    public void TakeDamage(byte playerDamage)
     {
-        return damageOnHit;
+        if(playerDamage >= hp)
+        {
+            gameObject.SetActive(false);
+            hp = MAX_HP;
+        }
+        hp -= playerDamage;
     }
 }

@@ -7,27 +7,27 @@ using Random = UnityEngine.Random;
 public class PlayerController : MonoBehaviour
 {
     private const float ATTACK_TIME = 0.4f; 
-    private const int MAX_HP = 100;
+    private const byte MAX_HP = 100;
 
-    public GameObject attack; //dont need
-    public int hp;
+
     public float jumpForce;
     public float moveSpeed;
+    private float inputX;
     public float damageCooldown;
-    public GameObject playerAttack; //dont need this
     public float baseAttack;
     public float attackDmgVariance;
     public AudioClip attackSE;
 
     public GameObject hpBar;
-
-    private AudioSource audioSource;
-    private Rigidbody2D rigidBody;
-    private float inputX;
-
-    private Animator anim;
     private Slider hpBarSlider;
     private TMPro.TextMeshProUGUI hpDisplayValue;
+    public byte hp;
+
+    private Animator anim;
+    private AudioSource audioSource;
+    private Rigidbody2D rigidBody;
+
+    
     private bool playerIsDeath = false;
     private bool isFacingRight = true;
     private bool isJumping = true;
@@ -38,42 +38,39 @@ public class PlayerController : MonoBehaviour
     {
         hp = MAX_HP;
         
-        rigidBody = gameObject.GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
+        rigidBody = gameObject.GetComponent<Rigidbody2D>(); //this is fine
+        anim = GetComponent<Animator>(); //plays running and attacking animation
+        audioSource = GetComponent<AudioSource>(); //just for the attck
         
-        hpBarSlider = hpBar.GetComponent<Slider>();
-        hpDisplayValue = hpBar.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        hpBarSlider = hpBar.GetComponent<Slider>(); //this is for health ui
+        hpDisplayValue = hpBar.GetComponentInChildren<TMPro.TextMeshProUGUI>(); //this is for health ui
+
+        MyEvents.OnHealthPickUp.AddListener(addHealth);
+        MyEvents.OnPlayerDamaged.AddListener(subtractHealth);
+
+        updateHUD();
     }
 
     void Update()
     {
-        if (!playerIsDeath)
-        {
-            getControllerInput();
-            updateAnimation();
-            updateHUD(); //only when something changes
+       getControllerInput();
+       updateAnimation();
             
-            if (hp <= 0)
-            {
-                hp = 0;
-                playerIsDeath = true;
-            }
-        }
+          
     }
 
-    private void getControllerInput()
+    private void getControllerInput() //overall fine, but jumping needs to be fixed
     {
         inputX = Input.GetAxis("Horizontal");
         transform.Translate(new Vector3(inputX * moveSpeed, 0, 0) * Time.deltaTime);
 
-        if (Input.GetButtonDown("Jump") && !isJumping)
+        if (Input.GetButtonDown("Jump") && !isJumping) //this needs to changed
         {
             isJumping = true;
             rigidBody.AddForce(new Vector3(0, 1 * jumpForce, 0), ForceMode2D.Impulse);
         }
 
-        if (Input.GetButtonDown("Fire1") && !isAttacking)
+        if (Input.GetButtonDown("Fire1") && !isAttacking) //fine
         {
             StartCoroutine(performAttack(ATTACK_TIME));
         }
@@ -100,7 +97,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void flipFacingDirection()
+    private void flipFacingDirection() //this is fine since it changes the scale of everything of the player
     {
         gameObject.transform.localScale = new Vector3(gameObject.transform.localScale.x * -1,
         gameObject.transform.localScale.y, gameObject.transform.localScale.z);
@@ -111,19 +108,12 @@ public class PlayerController : MonoBehaviour
         isAttacking = true;
         audioSource.PlayOneShot(attackSE);
         anim.SetBool("isAttacking", isAttacking);
-        GameObject attack = GameObject.Instantiate(playerAttack, transform.position, Quaternion.identity);
-        attack.GetComponent<PlayerAttack>().setAttackProperties(
-            baseAttack + Random.Range(-attackDmgVariance, attackDmgVariance), 
-            0.1f, 
-            0, 
-            new Vector3(0,0,0));
         yield return new WaitForSeconds(waitTime);
         
         isAttacking = false;
         anim.SetBool("isAttacking", isAttacking);
     }
 
-    // using Collision2D, not Collision (3D)
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Floor")
@@ -133,8 +123,6 @@ public class PlayerController : MonoBehaviour
 
         if (!isTakingDamage && collision.gameObject.tag == "Enemy")
         {
-            int damage = collision.gameObject.GetComponent <EnemyAIController>().getDamageOnHit();
-            hp -= damage;
             StartCoroutine(waitForDamageCooldown(damageCooldown));
         }
     }
@@ -142,14 +130,13 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.gameObject.tag == "Bullet")
-        {
-            Destroy(collider.gameObject);
-
+        { 
             if (!isTakingDamage)
             {
                 hp -= 10;
                 StartCoroutine(waitForDamageCooldown(damageCooldown));
             }
+            Destroy(collider.gameObject);
         }
     }
 
@@ -166,9 +153,25 @@ public class PlayerController : MonoBehaviour
         return playerIsDeath;
     }
 
-    public void addHealth(int value)
-    {
+    public void addHealth(byte value)
+    { 
         hp += value;
+        if(hp >= MAX_HP)
+        {
+            hp = MAX_HP;
+        }
+        updateHUD();
+    }
+
+    public void subtractHealth(byte value)
+    {
+        if(hp <= value)
+        {
+            hp = 0;
+            MyEvents.OnPlayerDeath.Invoke();
+        }
+        hp -= value;
+        updateHUD();
     }
 
     public void changeSpeed(float duration, float modifier)

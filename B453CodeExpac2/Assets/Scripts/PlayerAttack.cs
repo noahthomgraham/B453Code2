@@ -3,37 +3,32 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    public float damage;
-    public float projectileSpeed;
-    public float attackDecayTime;
-    public Vector3 direction;
+    [SerializeField] byte minimumDamage;
+    [SerializeField] byte maximumDamage;
+    [SerializeField] byte critChance;
     
-    void Start()
-    {
-        StartCoroutine(selfDestruct(attackDecayTime));
-    }
 
-    void Update()
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        gameObject.transform.position +=  Time.deltaTime * projectileSpeed * direction;
-    }
+        if (collision.gameObject.tag == "Enemy")
+        {
+           byte diceRoll =  (byte) Random.Range(1, 101);
+        
+           if (diceRoll >= 100 - critChance)
+           {
+              collision.gameObject.GetComponent<EnemyAIController>().TakeDamage((byte)(2 * maximumDamage));
+                Debug.Log("Player damage is:" + (byte)(2 * maximumDamage));
+           }
 
-    IEnumerator selfDestruct(float decayTime)
-    {
-        yield return new WaitForSeconds(decayTime);
-        Destroy(gameObject);
-    }
+           else if (diceRoll < 100 - critChance)
+           {
+              collision.gameObject.GetComponent<EnemyAIController>().TakeDamage((byte)(Random.Range(minimumDamage, (maximumDamage + 1))));
+           }
 
-    public float getDamage()
-    {
-        return damage;
-    }
-
-    public void setAttackProperties(float damage, float attackDecayTime, float projectileSpeed, Vector3 direction)
-    {
-        this.damage = damage;
-        this.attackDecayTime = attackDecayTime;
-        this.projectileSpeed = projectileSpeed;
-        this.direction = direction;
+           else 
+           {
+              collision.gameObject.GetComponent<EnemyAIController>().TakeDamage(0);
+           }
+        }
     }
 }

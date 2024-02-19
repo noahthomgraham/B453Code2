@@ -175,6 +175,7 @@ MonoBehaviour:
   effect: 0
   effectDuration: 0
   amount: 15
+  healAmount: 15
   sealButton: 0
   effectSE: {fileID: 8300000, guid: 95f986cc2f909414184a1d34dfe5f329, type: 3}
 --- !u!1 &7287475673574393395
