@@ -17,17 +17,22 @@ public class PlayerAttack : MonoBehaviour
            if (diceRoll >= 100 - critChance)
            {
               collision.gameObject.GetComponent<EnemyAIController>().TakeDamage((byte)(2 * maximumDamage));
-                Debug.Log("Player damage is:" + (byte)(2 * maximumDamage));
+                Debug.Log("Critical Hit!");
+              Debug.Log("Player damage is:" + (byte)(2 * maximumDamage));
            }
 
-           else if (diceRoll < 100 - critChance)
+           else if (diceRoll - critChance < 0)
            {
-              collision.gameObject.GetComponent<EnemyAIController>().TakeDamage((byte)(Random.Range(minimumDamage, (maximumDamage + 1))));
+                Debug.Log("Critical Fail!");
+                Debug.Log("Player damage is: 0");
            }
 
            else 
            {
-              collision.gameObject.GetComponent<EnemyAIController>().TakeDamage(0);
+              byte normalDamage = (byte)(Random.Range(minimumDamage, (maximumDamage + 1)));
+              Debug.Log("Took normal damage");
+              Debug.Log("Player damage is: " + normalDamage);
+              collision.gameObject.GetComponent<EnemyAIController>().TakeDamage(normalDamage);
            }
         }
     }

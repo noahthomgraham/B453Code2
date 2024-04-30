@@ -23,6 +23,7 @@ public class EnemyAIController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        hp = MAX_HP;
         GameObject spawnedEnemyTracker = GameObject.Find("AllEnemiesOnStage");
         transform.SetParent(spawnedEnemyTracker.transform);
         playerPosition = GameObject.FindGameObjectWithTag("Player").transform;

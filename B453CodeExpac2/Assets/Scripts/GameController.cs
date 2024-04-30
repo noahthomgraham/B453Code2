@@ -34,7 +34,9 @@ public class GameController : MonoBehaviour
         
         gameoverDialog.SetActive(false);
         pauseDialog.SetActive(false);
-        
+        MyEvents.OnPlayerDeath.AddListener(OpenGameoverDialog);
+
+
         PlayerPrefs.SetInt("Score", 0);
     }
 

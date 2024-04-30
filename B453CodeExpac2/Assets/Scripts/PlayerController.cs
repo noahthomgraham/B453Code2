@@ -55,8 +55,6 @@ public class PlayerController : MonoBehaviour
     {
        getControllerInput();
        updateAnimation();
-            
-          
     }
 
     private void getControllerInput() //overall fine, but jumping needs to be fixed
@@ -64,11 +62,27 @@ public class PlayerController : MonoBehaviour
         inputX = Input.GetAxis("Horizontal");
         transform.Translate(new Vector3(inputX * moveSpeed, 0, 0) * Time.deltaTime);
 
-        if (Input.GetButtonDown("Jump") && !isJumping) //this needs to changed
-        {
-            isJumping = true;
-            rigidBody.AddForce(new Vector3(0, 1 * jumpForce, 0), ForceMode2D.Impulse);
-        }
+        //Ray ray = new Ray(transform.position, new Vector2(0, -1));
+        //RaycastHit hit;
+
+        //if(Physics.Raycast(ray, out hit, 10f, 0))
+        //{
+            //if(hit.collider.gameObject.tag == "Floor") 
+            //{
+                //Debug.Log("Im getting here");
+                //isJumping = false;
+                if (Input.GetButtonDown("Jump") && !isJumping) //this needs to changed
+                {
+                    isJumping = true;
+                    rigidBody.AddForce(new Vector3(0, 1 * jumpForce, 0), ForceMode2D.Impulse);
+                    Debug.Log("Is on ground"); 
+                }
+            //}
+        //}
+
+        //Fix: double jumping
+        //Where: playercontroller
+        //How: add an "isOnGround" boolean and just check that in if statement. Also raycast directly below player to see if on ground.
 
         if (Input.GetButtonDown("Fire1") && !isAttacking) //fine
         {
@@ -165,12 +179,15 @@ public class PlayerController : MonoBehaviour
 
     public void subtractHealth(byte value)
     {
-        if(hp <= value)
+        if (hp <= value)
         {
             hp = 0;
             MyEvents.OnPlayerDeath.Invoke();
         }
-        hp -= value;
+        else
+        {
+            hp -= value;
+        }
         updateHUD();
     }
 
